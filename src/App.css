@@ -90,3 +90,18 @@
   transform: translateY(-4px) scale(1.02);
   box-shadow: 0 8px 20px rgba(0, 255, 255, 0.08);
 }
+
+
+
+/* password confirmation check */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+  75% { transform: translateX(-4px); }
+  100% { transform: translateX(0); }
+}
+
+.input-shake {
+  animation: shake 0.4s ease-in-out;
+}

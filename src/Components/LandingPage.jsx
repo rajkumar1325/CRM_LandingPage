@@ -1,11 +1,24 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 export default function LandingPage() {
+  // ================================
+  // STATE
+  // ================================
+
   // parallax scroll value
   const [scrollY, setScrollY] = useState(0);
 
-  // auth form toggle
-  const [authMode, setAuthMode] = useState("signup"); // login /signup
+  // auth form mode: "signup" | "login"
+  const [authMode, setAuthMode] = useState("signup");
+
+  // which role is currently selected: "admin" | "manager" | "user" | null
+  const [selectedRole, setSelectedRole] = useState(null);
+
+  // highlight + zoom animation state for auth card
+  const [authHighlight, setAuthHighlight] = useState(false);
+
+  // reference to the auth card block (for scrolling)
+  const authCardRef = useRef(null);
 
   // testimonial slider index
   const [testimonialIndex, setTestimonialIndex] = useState(0);
@@ -13,8 +26,9 @@ export default function LandingPage() {
   // faq open index
   const [openFaq, setOpenFaq] = useState(null);
 
-  
-  //   SCROLL LISTENER (PARALLAX)
+  // ================================
+  // SCROLL LISTENER (PARALLAX)
+  // ================================
   useEffect(() => {
     let ticking = false;
 
@@ -32,8 +46,30 @@ export default function LandingPage() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  
-  //...........................................Testimonials
+
+
+
+  // P............................................Password Check 
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [shake, setShake] = useState(false);
+
+  // password validation logic
+  const passwordMatch = password === confirmPassword && password.length>0;
+  const triggerShake =() => {
+    setShake(true);
+    setTimeout(() => {
+      setShake(false);
+    }, 400);
+  }
+
+
+
+
+
+  // ================================
+  // DATA: Testimonials & FAQs
+  // ================================
   const testimonials = [
     {
       name: "Tony Start",
@@ -52,7 +88,6 @@ export default function LandingPage() {
     },
   ];
 
-  // ...........................................FAQs
   const faqs = [
     {
       q: "Is this CRM good for small teams?",
@@ -72,6 +107,9 @@ export default function LandingPage() {
     },
   ];
 
+  // ================================
+  // TESTIMONIAL HANDLERS
+  // ================================
   const nextTestimonial = () => {
     setTestimonialIndex((prev) => (prev + 1) % testimonials.length);
   };
@@ -80,17 +118,39 @@ export default function LandingPage() {
     setTestimonialIndex((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1));
   };
 
-  // parallax offsets
+
+
+  
+  // AUTH CARD SCROLL + HIGHLIGHT
+  const focusAuthCard = () => {
+    // Scroll the auth card into view
+    if (authCardRef.current) {
+      authCardRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+
+    // Trigger zoom / highlight animation
+    setAuthHighlight(true);
+    setTimeout(() => setAuthHighlight(false), 700); // reset after animation duration
+  };
+
+  // ================================
+  // PARALLAX CALCS
+  // ================================
   const layer1 = scrollY * 0.1;
   const layer2 = scrollY * 0.2;
 
+  // ================================
+  // RENDER
+  // ================================
   return (
     <div className="min-h-screen bg-[#050816] text-gray-100 relative overflow-hidden">
-  
-      {/* ================= GLOW BEAM ================= */}
+      {/* ================= GLOW BEAM (BACKGROUND FX) ================= */}
       <div className="glow-stream"></div>
 
-      {/* ================= BACKGROUND LAYERS ================= */}
+      {/* ================= BACKGROUND LAYERS (PARALLAX) ================= */}
       <div
         className="pointer-events-none absolute -top-40 -left-40 h-72 w-72 rounded-full bg-purple-600/40 blur-3xl"
         style={{ transform: `translateY(${layer1}px)` }}
@@ -116,40 +176,80 @@ export default function LandingPage() {
         />
       </div>
 
-      {/* ================= PAGE CONTENT ================= */}
+      {/* ================= PAGE CONTENT WRAPPER ================= */}
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        {/* -------- NAVBAR -------- */}
+        {/* ================= NAVBAR ================= */}
         <header className="flex items-center justify-between py-5">
+          {/* Logo + name */}
           <div className="flex items-center gap-2">
             <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-cyan-400 via-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-cyan-500/40">
               <span className="text-xs font-bold tracking-widest">CRM</span>
             </div>
+
             <div className="hidden sm:flex flex-col leading-tight">
-              <span className="font-semibold text-sm sm:text-base">OrbitCRM</span>
+              <span className="font-semibold text-sm sm:text-base">CuriumCRM</span>
               <span className="text-[10px] text-gray-400">Close more deals, faster.</span>
             </div>
           </div>
 
+          {/* nav-items */}
           <nav className="hidden md:flex items-center gap-8 text-sm text-gray-300">
-            <a href="#features" className="hover:text-white transition">Features</a>
-            <a href="#pricing" className="hover:text-white transition">Pricing</a>
-            <a href="#testimonials" className="hover:text-white transition">Customers</a>
-            <a href="#faq" className="hover:text-white transition">FAQ</a>
+            <a href="#features" className="hover:text-white transition">
+              Features
+            </a>
+            <a href="#pricing" className="hover:text-white transition">
+              Pricing
+            </a>
+            <a href="#testimonials" className="hover:text-white transition">
+              Customers
+            </a>
+            <a href="#faq" className="hover:text-white transition">
+              FAQ
+            </a>
           </nav>
 
+          {/* Top-right: Login / Start free trial */}
           <div className="flex items-center gap-2 sm:gap-3">
-            <button className="text-xs sm:text-sm text-gray-300 hover:text-white">Login</button>
-            <button className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-500 text-black shadow-md shadow-cyan-500/40 hover:brightness-110 transition">
+            {/* LOGIN: text button with active styling when authMode is "login" */}
+            <button
+              onClick={() => {
+                setAuthMode("login");
+                focusAuthCard();
+              }}
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition 
+                ${
+                authMode === "login"
+                ? "bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-500 text-black shadow-md shadow-cyan-500/40 hover:brightness-110"
+                : "bg-white text-black shadow-lg shadow-white/20"
+              }`}
+            >
+              Login
+            </button>
+
+            {/* START FREE TRIAL: pill button, styled active when authMode is "signup" */}
+            <button
+              onClick={() => {
+                setAuthMode("signup");
+                focusAuthCard();
+              }}
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition
+                ${
+                  authMode === "signup"
+                  ? "bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-500 text-black shadow-md shadow-cyan-500/40 hover:brightness-110"
+                  : "bg-white text-black shadow-lg shadow-white/20"
+                }`}
+            >
               Start free trial
             </button>
           </div>
         </header>
 
-        {/* -------- HERO SECTION -------- */}
-        <section className="pt-6 pb-16 sm:pt-10 sm:pb-20 lg:pt-16 lg:pb-24 flex flex-col lg:flex-row items-center gap-10 lg:gap-20 fade-section">
 
-          {/* left side */}
+
+
+        {/* ================= HERO SECTION ================= */}
+        <section className="pt-6 pb-16 sm:pt-10 sm:pb-20 lg:pt-16 lg:pb-24 flex flex-col lg:flex-row items-center gap-10 lg:gap-20 fade-section">
+          {/* -------- LEFT SIDE HERO TEXT -------- */}
           <div className="flex-1">
             <div className="inline-flex items-center gap-2 rounded-full border border-cyan-400/30 bg-cyan-500/5 px-3 py-1 text-[11px] sm:text-xs text-cyan-200 mb-4">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -164,7 +264,9 @@ export default function LandingPage() {
             </h1>
 
             <p className="mt-4 text-xs sm:text-sm md:text-base text-gray-300 max-w-xl">
-              Track leads, automate follow-ups, and get a clear view of your recurring revenue — all in one simple, fast CRM designed for subscription businesses.
+              Track leads, automate follow-ups, and get a clear view of your recurring
+              revenue — all in one simple, fast CRM designed for subscription
+              businesses.
             </p>
 
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
@@ -178,51 +280,131 @@ export default function LandingPage() {
             </div>
 
             <div className="mt-6 flex flex-wrap gap-4 text-[11px] sm:text-xs text-gray-400">
-              <div><span className="font-semibold text-gray-100">+24%</span> faster response time</div>
-              <div><span className="font-semibold text-gray-100">+18%</span> more closed deals</div>
-              <div><span className="font-semibold text-gray-100">14-day</span> free trial, no card</div>
+              <div>
+                <span className="font-semibold text-gray-100">+24%</span> faster response
+                time
+              </div>
+              <div>
+                <span className="font-semibold text-gray-100">+18%</span> more closed
+                deals
+              </div>
+              <div>
+                <span className="font-semibold text-gray-100">14-day</span> free trial, no
+                card
+              </div>
             </div>
           </div>
 
-          {/* auth card */}
-          <div className="w-full max-w-md lg:max-w-sm fade-section fade-delay-1">
-            <div className="rounded-2xl bg-[#050b17]/80 border border-gray-700/60 shadow-xl shadow-cyan-500/20 p-4 sm:p-6 backdrop-blur-md">
 
+
+
+
+          {/* -------------------------------- RIGHT SIDE --AUTH BLOCK -------- */}
+          <div
+            ref={authCardRef}
+            className={`transition-all duration-500 ${
+              authHighlight ? "scale-105 ring-2 ring-cyan-400/50 shadow-2xl" : "scale-100"
+            } w-full max-w-md lg:max-w-sm`}
+          >
+            <div className="rounded-2xl bg-[#050b17]/80 border border-gray-700/60 shadow-xl shadow-cyan-500/20 p-5 backdrop-blur-md">
+              
+              {/* ===== ROLE SELECTION ALWAYS VISIBLE ===== */}
+              <h2 className="text-sm font-semibold mb-2">Choose your role</h2>
+
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                {["admin", "manager", "user"].map((role) => (
+                  <div
+                    key={role}
+                    onClick={() => setSelectedRole(role)}
+                    className={`cursor-pointer p-3 rounded-xl border text-center transition 
+                      ${
+                        selectedRole === role
+                          ? "border-cyan-400 bg-cyan-400/10 shadow-md shadow-cyan-500/30"
+                          : "border-gray-700 hover:border-cyan-400"
+                      }`}
+                    title={
+                      role === "admin"
+                        ? "Full access to settings, teams, and billing."
+                        : role === "manager"
+                        ? "Manage team pipelines and performance."
+                        : "Focus on your own leads and tasks."
+                    }
+                  >
+                    <span className="text-white font-medium capitalize">{role}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Selected Role Indicator */}
+              <p className="text-xs text-cyan-300 mb-3">
+                Selected role:{" "}
+                {selectedRole ? (
+                  <strong className="uppercase">{selectedRole}</strong>
+                ) : (
+                  <span className="text-gray-500">None selected</span>
+                )}
+              </p>
+
+
+
+              {/* ===== LOGIN / SIGNUP TOGGLE ===== */}
               <div className="flex mb-4 rounded-full bg-gray-800/70 p-1 text-xs sm:text-sm">
                 <button
                   onClick={() => setAuthMode("signup")}
                   className={`flex-1 py-1.5 rounded-full transition ${
                     authMode === "signup"
-                      ? "bg-white text-slate-900 font-semibold"
-                      : "text-gray-300"
+                      ? "bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-500 text-black shadow-md shadow-cyan-500/40 hover:brightness-110"
+                  : "bg-white text-black shadow-lg shadow-white/20"
                   }`}
                 >
                   Sign up
                 </button>
+
                 <button
                   onClick={() => setAuthMode("login")}
                   className={`flex-1 py-1.5 rounded-full transition ${
                     authMode === "login"
-                      ? "bg-white text-slate-900 font-semibold"
-                      : "text-gray-300"
+                      ? "bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-500 text-black shadow-md shadow-cyan-500/40 hover:brightness-110"
+                  : "bg-white text-black shadow-lg shadow-white/20"
                   }`}
                 >
                   Login
                 </button>
               </div>
 
+
+
+              {/* ===== AUTH FORM CONTENT ===== */}
               <h2 className="text-sm sm:text-base md:text-lg font-semibold mb-1">
                 {authMode === "signup" ? "Create your workspace" : "Welcome back"}
               </h2>
+
               <p className="text-[11px] sm:text-xs text-gray-400 mb-4">
                 {authMode === "signup"
                   ? "Start your free 14-day trial. No credit card needed."
                   : "Sign in to view your deals, tasks, and pipeline."}
               </p>
 
+
+      {/* .......................................FORM ...................... */}
               <form className="space-y-3 text-[11px] sm:text-xs">
+
+                  {/* company name */}  
+                  <div className="space-y-1">
+                    <label className="block text-gray-300">Company name</label>
+                    <input
+                      type="text"
+                      className="w-full rounded-lg bg-[#050816] border border-gray-700 px-3 py-2 text-xs sm:text-sm text-gray-100 outline-none focus:border-cyan-400"
+                      placeholder="Acme Inc."
+                    />
+                  </div>
+
+
+
+                {/* Signup-only fields as we use && */}
                 {authMode === "signup" && (
                   <>
+                    {/* email input */}
                     <div className="space-y-1">
                       <label className="block text-gray-300">Work email</label>
                       <input
@@ -231,51 +413,109 @@ export default function LandingPage() {
                         placeholder="you@company.com"
                       />
                     </div>
-
-                    <div className="space-y-1">
-                      <label className="block text-gray-300">Company name</label>
-                      <input
-                        type="text"
-                        className="w-full rounded-lg bg-[#050816] border border-gray-700 px-3 py-2 text-xs sm:text-sm text-gray-100 outline-none focus:border-cyan-400"
-                        placeholder="Acme Inc."
-                      />
-                    </div>
                   </>
+
                 )}
 
+                {/* password */}
                 <div className="space-y-1">
                   <label className="block text-gray-300">Password</label>
                   <input
                     type="password"
-                    className="w-full rounded-lg bg-[#050816] border border-gray-700 px-3 py-2 text-xs sm:text-sm text-gray-100 outline-none focus:border-cyan-400"
+                    value={password}
+
+                    onChange={ (e)=> setPassword(e.target.value) }
+
+                    className={`w-full rounded-lg bg-[#050816] border px-3 py-2 text-xs sm:text-sm text-gray-100 outline-none 
+                        ${password && !passwordMatch ? "border-red-500" : "border-gray-700"} 
+                        ${shake ? "input-shake" : ""}
+                      `}
+
                     placeholder="••••••••"
                   />
                 </div>
 
+
+                {/* Confirm password */}
+                <div className="space-y-1">
+                  <label className="block text-gray-300">Confirm Password</label>
+                  <input
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e)=> setConfirmPassword(e.target.value)}
+                    onBlur={() => {
+                          if (!passwordMatch) triggerShake();
+                        }}
+
+                    
+                    className={`w-full rounded-lg bg-[#050816] border px-3 py-2 text-xs sm:text-sm text-gray-100 outline-none 
+                          ${confirmPassword && !passwordMatch ? "border-red-500" : "border-gray-700"} 
+                          ${shake ? "input-shake" : ""}
+                        `}
+                    placeholder="••••••••"
+                  />
+                </div>
+
+
+                {/* MATCH / ERROR MESSAGE */}
+                {password && confirmPassword && (
+                  <p className={`text-xs ${
+                      passwordMatch ? "text-green-400" : "text-red-400"
+                  }`}>
+                    {passwordMatch ? "Passwords match " : "Passwords do not match "}
+                  </p>
+                )}
+
+
+                {/* Submit button (you can hook real submit logic here later) */}
                 <button
                   type="button"
-                  className="w-full mt-2 rounded-lg bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-500 text-slate-900 text-xs sm:text-sm font-semibold py-2.5 shadow-md shadow-cyan-500/40 hover:brightness-110 transition"
+                  disabled={!passwordMatch}
+                  className={`w-full mt-2 rounded-lg text-xs sm:text-sm font-semibold py-2.5 transition
+                    ${
+                      passwordMatch
+                        ? "bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-500 text-slate-900 shadow-md shadow-cyan-500/40 hover:brightness-110"
+                        : "bg-gray-700 text-gray-400 cursor-not-allowed"
+                    }
+                  `}
                 >
-                  {authMode === "signup" ? "Create account" : "Login to dashboard"}
+                  Create account
                 </button>
+
               </form>
 
+              {/* Legal */}
               <p className="mt-3 text-[10px] sm:text-[11px] text-gray-500">
                 By continuing, you agree to our{" "}
-                <span className="text-cyan-300 cursor-pointer">Terms</span> and{" "}
-                <span className="text-cyan-300 cursor-pointer">Privacy Policy</span>.
+
+                <span className="text-cyan-300 cursor-pointer" 
+                      onClick={(e)=> {
+                        console.log(e);
+                        alert("Terms and Conditions");
+                        }
+                      }>Terms</span> and{" "}
+
+                <span className="text-cyan-300 cursor-pointer" 
+                      onClick={ (e)=> {
+                        console.log(e);
+                        alert("Read our Privacy Policy {e}") 
+                      }
+                      }>Privacy Policy</span>.
               </p>
             </div>
           </div>
         </section>
 
-        {/* -------- FEATURES -------- */}
+        {/* ================= FEATURES SECTION ================= */}
         <section id="features" className="py-10 sm:py-14 border-t border-gray-800/70">
           <div className="flex justify-between items-end mb-6 fade-section">
             <div>
-              <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">Stay on top of every lead.</h2>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">
+                Stay on top of every lead.
+              </h2>
               <p className="text-xs sm:text-sm text-gray-400 mt-1 max-w-md">
-                One workspace for leads, conversations, tasks, and revenue — designed so your team never misses a follow-up again.
+                One workspace for leads, conversations, tasks, and revenue — designed so
+                your team never misses a follow-up again.
               </p>
             </div>
             <p className="hidden sm:block text-[11px] text-gray-400">
@@ -286,8 +526,12 @@ export default function LandingPage() {
           <div className="grid md:grid-cols-3 gap-5">
             {/* CARD 1 */}
             <div className="rounded-2xl border border-gray-800 bg-[#050b17]/90 p-4 shadow-sm shadow-cyan-500/10 card-hover fade-section fade-delay-1">
-              <p className="text-[11px] text-cyan-300 mb-1 uppercase tracking-wide">Lead Inbox</p>
-              <h3 className="text-sm sm:text-base font-semibold mb-2">Central lead timeline</h3>
+              <p className="text-[11px] text-cyan-300 mb-1 uppercase tracking-wide">
+                Lead Inbox
+              </p>
+              <h3 className="text-sm sm:text-base font-semibold mb-2">
+                Central lead timeline
+              </h3>
               <p className="text-xs text-gray-400 mb-3">
                 View every touchpoint — emails, calls, notes — in one place.
               </p>
@@ -300,8 +544,12 @@ export default function LandingPage() {
 
             {/* CARD 2 */}
             <div className="rounded-2xl border border-gray-800 bg-[#050b17]/90 p-4 shadow-sm shadow-purple-500/10 card-hover fade-section fade-delay-2">
-              <p className="text-[11px] text-purple-300 mb-1 uppercase tracking-wide">Tasks & Activities</p>
-              <h3 className="text-sm sm:text-base font-semibold mb-2">Smart daily task list</h3>
+              <p className="text-[11px] text-purple-300 mb-1 uppercase tracking-wide">
+                Tasks & Activities
+              </p>
+              <h3 className="text-sm sm:text-base font-semibold mb-2">
+                Smart daily task list
+              </h3>
               <p className="text-xs text-gray-400 mb-3">
                 Auto-built to-dos based on due follow-ups, new leads, and renewal dates.
               </p>
@@ -314,8 +562,12 @@ export default function LandingPage() {
 
             {/* CARD 3 */}
             <div className="rounded-2xl border border-gray-800 bg-[#050b17]/90 p-4 shadow-sm shadow-emerald-500/10 card-hover fade-section fade-delay-3">
-              <p className="text-[11px] text-emerald-300 mb-1 uppercase tracking-wide">Revenue Insights</p>
-              <h3 className="text-sm sm:text-base font-semibold mb-2">Clean subscription analytics</h3>
+              <p className="text-[11px] text-emerald-300 mb-1 uppercase tracking-wide">
+                Revenue Insights
+              </p>
+              <h3 className="text-sm sm:text-base font-semibold mb-2">
+                Clean subscription analytics
+              </h3>
               <p className="text-xs text-gray-400 mb-3">
                 Track MRR, churn, expansion, and win-rates with simple charts.
               </p>
@@ -328,10 +580,12 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* -------- PRICING -------- */}
+        {/* ================= PRICING SECTION ================= */}
         <section id="pricing" className="py-10 sm:py-14 border-t border-gray-800/70">
           <div className="text-center mb-8 fade-section">
-            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">Simple, transparent pricing.</h2>
+            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">
+              Simple, transparent pricing.
+            </h2>
             <p className="text-xs sm:text-sm text-gray-400 mt-2">
               Start free, upgrade only when your team is ready.
             </p>
@@ -341,7 +595,9 @@ export default function LandingPage() {
             {/* Starter */}
             <div className="rounded-2xl border border-gray-800 bg-[#050b17]/90 p-5 flex flex-col card-hover fade-section fade-delay-1">
               <h3 className="text-sm sm:text-base font-semibold mb-1">Starter</h3>
-              <p className="text-xs text-gray-400 mb-3">For solo founders and very small teams.</p>
+              <p className="text-xs text-gray-400 mb-3">
+                For solo founders and very small teams.
+              </p>
               <div className="flex items-baseline gap-1 mb-4">
                 <span className="text-xl sm:text-2xl font-semibold">$0</span>
                 <span className="text-[11px] text-gray-400">/ user / mo</span>
@@ -384,7 +640,9 @@ export default function LandingPage() {
             {/* Scale */}
             <div className="rounded-2xl border border-gray-800 bg-[#050b17]/90 p-5 flex flex-col card-hover fade-section fade-delay-3">
               <h3 className="text-sm sm:text-base font-semibold mb-1">Scale</h3>
-              <p className="text-xs text-gray-400 mb-3">For large teams needing governance.</p>
+              <p className="text-xs text-gray-400 mb-3">
+                For large teams needing governance.
+              </p>
               <div className="flex items-baseline gap-1 mb-4">
                 <span className="text-xl sm:text-2xl font-semibold">Let's talk</span>
               </div>
@@ -401,11 +659,13 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* -------- TESTIMONIALS -------- */}
+        {/* ================= TESTIMONIALS SECTION ================= */}
         <section id="testimonials" className="py-10 sm:py-14 border-t border-gray-800/70">
           <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6 fade-section">
             <div>
-              <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">Teams that already trust OrbitCRM.</h2>
+              <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">
+                Teams that already trust OrbitCRM.
+              </h2>
               <p className="text-xs sm:text-sm text-gray-400 mt-1 max-w-md">
                 See how teams use OrbitCRM to stabilize and grow revenue.
               </p>
@@ -434,7 +694,9 @@ export default function LandingPage() {
 
             <div className="flex items-center justify-between text-[11px] sm:text-xs text-gray-400">
               <div>
-                <p className="font-semibold text-gray-100">{testimonials[testimonialIndex].name}</p>
+                <p className="font-semibold text-gray-100">
+                  {testimonials[testimonialIndex].name}
+                </p>
                 <p>{testimonials[testimonialIndex].role}</p>
               </div>
 
@@ -452,10 +714,12 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* -------- FAQ -------- */}
+        {/* ================= FAQ SECTION ================= */}
         <section id="faq" className="py-10 sm:py-14 border-t border-gray-800/70">
           <div className="text-center mb-6 fade-section">
-            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">Answers to common questions.</h2>
+            <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">
+              Answers to common questions.
+            </h2>
             <p className="text-xs sm:text-sm text-gray-400 mt-2">
               Have something else in mind? Reach out anytime.
             </p>
@@ -471,12 +735,18 @@ export default function LandingPage() {
                   onClick={() => setOpenFaq(open ? null : idx)}
                 >
                   <div className="flex items-center justify-between gap-3">
-                    <p className="text-xs sm:text-sm font-medium text-gray-100">{item.q}</p>
-                    <span className="text-gray-400 text-xs">{open ? "–" : "+"}</span>
+                    <p className="text-xs sm:text-sm font-medium text-gray-100">
+                      {item.q}
+                    </p>
+                    <span className="text-gray-400 text-xs">
+                      {open ? "–" : "+"}
+                    </span>
                   </div>
 
                   {open && (
-                    <p className="mt-2 text-[11px] sm:text-xs text-gray-400">{item.a}</p>
+                    <p className="mt-2 text-[11px] sm:text-xs text-gray-400">
+                      {item.a}
+                    </p>
                   )}
                 </div>
               );
@@ -484,15 +754,23 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* -------- FOOTER -------- */}
+        {/* ================= FOOTER ================= */}
         <footer className="py-6 border-t border-gray-800/70 text-[11px] sm:text-xs text-gray-500">
           <div className="flex flex-col sm:flex-row justify-between gap-3 items-center">
             <p>© {new Date().getFullYear()} OrbitCRM. All rights reserved.</p>
             <div className="flex gap-4">
-              <a href="#!" className="hover:text-gray-300">Privacy</a>
-              <a href="#!" className="hover:text-gray-300">Terms</a>
-              <a href="#!" className="hover:text-gray-300">Docs</a>
-              <a href="#!" className="hover:text-gray-300">Status</a>
+              <a href="#!" className="hover:text-gray-300">
+                Privacy
+              </a>
+              <a href="#!" className="hover:text-gray-300">
+                Terms
+              </a>
+              <a href="#!" className="hover:text-gray-300">
+                Docs
+              </a>
+              <a href="#!" className="hover:text-gray-300">
+                Status
+              </a>
             </div>
           </div>
         </footer>
