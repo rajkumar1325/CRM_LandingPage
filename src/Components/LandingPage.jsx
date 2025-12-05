@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
+import LogoIcon from "../Assets/Icons/logoIcon.svg?react";
 
 export default function LandingPage() {
   // ================================
@@ -65,6 +66,9 @@ export default function LandingPage() {
 
 
 
+
+  // .........................................Pricing plans
+  const [selectedPlan, setSelectedPlan] = useState('Growth');
 
 
   // ================================
@@ -146,7 +150,7 @@ export default function LandingPage() {
   // RENDER
   // ================================
   return (
-    <div className="min-h-screen bg-[#050816] text-gray-100 relative overflow-hidden">
+    <div className="min-h-screen bg-[#050816] text-gray-100 relative overflow-x-hidden">
       {/* ================= GLOW BEAM (BACKGROUND FX) ================= */}
       <div className="glow-stream"></div>
 
@@ -177,13 +181,14 @@ export default function LandingPage() {
       </div>
 
       {/* ================= PAGE CONTENT WRAPPER ================= */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* ================= NAVBAR ================= */}
         <header className="flex items-center justify-between py-5">
+
           {/* Logo + name */}
           <div className="flex items-center gap-2">
             <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-cyan-400 via-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-cyan-500/40">
-              <span className="text-xs font-bold tracking-widest">CRM</span>
+              <LogoIcon className="w-8 h-8 text-white" />
             </div>
 
             <div className="hidden sm:flex flex-col leading-tight">
@@ -270,9 +275,22 @@ export default function LandingPage() {
             </p>
 
             <div className="mt-6 flex flex-col sm:flex-row gap-3">
-              <button className="px-4 py-2.5 rounded-full bg-white text-xs sm:text-sm font-semibold text-slate-900 hover:bg-slate-100 transition shadow-lg shadow-white/10">
-                Get started in 2 minutes
+              <button 
+                onClick={() => {
+                  setAuthMode('signup');
+                  focusAuthCard();
+                } }
+
+                className={` px-26 rounded-full transition ${
+                    authMode === "signup"
+                      ? "bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-500 text-black shadow-md shadow-cyan-500/40 hover:brightness-110"
+                      : "bg-white text-black shadow-lg shadow-white/20"
+                  }`}
+              >
+                Getting started
+  
               </button>
+
               <button className="px-4 py-2.5 rounded-full border border-gray-600 text-xs sm:text-sm text-gray-200 hover:border-cyan-400 hover:text-cyan-300 transition flex items-center gap-2">
                 Watch 3-min overview
                 <span className="text-[11px]">▶</span>
@@ -302,8 +320,8 @@ export default function LandingPage() {
           {/* -------------------------------- RIGHT SIDE --AUTH BLOCK -------- */}
           <div
             ref={authCardRef}
-            className={`transition-all duration-500 ${
-              authHighlight ? "scale-105 ring-2 ring-cyan-400/50 shadow-2xl" : "scale-100"
+            className={`transition-all duration-500 rounded-2xl  ${
+              authHighlight ? "scale-105 ring-2 ring-cyan-400/50 shadow-2xl bg-gray-700" : "scale-100"
             } w-full max-w-md lg:max-w-sm`}
           >
             <div className="rounded-2xl bg-[#050b17]/80 border border-gray-700/60 shadow-xl shadow-cyan-500/20 p-5 backdrop-blur-md">
@@ -354,7 +372,7 @@ export default function LandingPage() {
                   className={`flex-1 py-1.5 rounded-full transition ${
                     authMode === "signup"
                       ? "bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-500 text-black shadow-md shadow-cyan-500/40 hover:brightness-110"
-                  : "bg-white text-black shadow-lg shadow-white/20"
+                      : "bg-white text-black shadow-lg shadow-white/20"
                   }`}
                 >
                   Sign up
@@ -498,13 +516,18 @@ export default function LandingPage() {
                 <span className="text-cyan-300 cursor-pointer" 
                       onClick={ (e)=> {
                         console.log(e);
-                        alert("Read our Privacy Policy {e}") 
+                        alert("Read our Privacy Policy") 
                       }
                       }>Privacy Policy</span>.
               </p>
             </div>
           </div>
         </section>
+
+
+
+
+
 
         {/* ================= FEATURES SECTION ================= */}
         <section id="features" className="py-10 sm:py-14 border-t border-gray-800/70">
@@ -579,8 +602,12 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+        
 
-        {/* ================= PRICING SECTION ================= */}
+
+        {/* Pricing section */}
+
+        {/* =================........................... PRICING SECTION ================= */}
         <section id="pricing" className="py-10 sm:py-14 border-t border-gray-800/70">
           <div className="text-center mb-8 fade-section">
             <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">
@@ -591,9 +618,42 @@ export default function LandingPage() {
             </p>
           </div>
 
+          {/* ====== PLAN TOGGLER ====== */}
+          <div className="flex justify-center mb-8">
+            <div className="flex bg-gray-800/60 rounded-full p-1 text-xs sm:text-sm shadow-inner border border-gray-700">
+              {["Starter", "Growth", "Scale"].map((plan) => (
+                <button
+                  key={plan}
+                  onClick={() => setSelectedPlan(plan)}
+                  className={`px-4 py-1.5 rounded-full transition-all font-medium
+                    ${
+                      selectedPlan === plan
+                        ? "bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-500 text-black shadow-md shadow-cyan-500/40"
+                        : "text-gray-300 hover:text-white"
+                    }
+                  `}
+                >
+                  {plan}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* ================= CARDS ================= */}
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-6">
+
             {/* Starter */}
-            <div className="rounded-2xl border border-gray-800 bg-[#050b17]/90 p-5 flex flex-col card-hover fade-section fade-delay-1">
+            <div
+              onClick={ ()=> setSelectedPlan('Starter')}
+              className={`rounded-2xl border bg-[#050b17]/90 p-5 flex flex-col card-hover 
+                fade-section fade-delay-1 transition-all
+                ${
+                  selectedPlan === "Starter"
+                    ? "border-cyan-400 shadow-cyan-500/40 scale-[1.03]"
+                    : "border-gray-800"
+                }
+              `}
+            >
               <h3 className="text-sm sm:text-base font-semibold mb-1">Starter</h3>
               <p className="text-xs text-gray-400 mb-3">
                 For solo founders and very small teams.
@@ -614,7 +674,17 @@ export default function LandingPage() {
             </div>
 
             {/* Growth */}
-            <div className="rounded-2xl border border-cyan-500/70 bg-gradient-to-b from-cyan-500/10 via-[#050b17]/90 to-[#050b17]/90 p-5 flex flex-col shadow-lg shadow-cyan-500/30 card-hover fade-section fade-delay-2">
+            <div
+              onClick={ ()=> setSelectedPlan("Growth") }
+              className={`rounded-2xl border bg-[#050b17]/90 p-5 flex flex-col card-hover 
+                fade-section fade-delay-2 transition-all
+                ${
+                  selectedPlan === "Growth"
+                    ? "border-cyan-400 shadow-cyan-500/40 scale-[1.03]"
+                    : "border-gray-800"
+                }
+              `}
+            >
               <div className="flex items-center justify-between mb-1">
                 <h3 className="text-sm sm:text-base font-semibold">Growth</h3>
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/60">
@@ -638,7 +708,17 @@ export default function LandingPage() {
             </div>
 
             {/* Scale */}
-            <div className="rounded-2xl border border-gray-800 bg-[#050b17]/90 p-5 flex flex-col card-hover fade-section fade-delay-3">
+            <div  
+              onClick={ () => setSelectedPlan("Scale")}
+              className={`rounded-2xl border bg-[#050b17]/90 p-5 flex flex-col card-hover 
+                fade-section fade-delay-3 transition-all
+                ${
+                  selectedPlan === "Scale"
+                    ? "border-cyan-400 shadow-cyan-500/40 scale-[1.03]"
+                    : "border-gray-800"
+                }
+              `}
+            >
               <h3 className="text-sm sm:text-base font-semibold mb-1">Scale</h3>
               <p className="text-xs text-gray-400 mb-3">
                 For large teams needing governance.
@@ -658,6 +738,9 @@ export default function LandingPage() {
             </div>
           </div>
         </section>
+
+
+
 
         {/* ================= TESTIMONIALS SECTION ================= */}
         <section id="testimonials" className="py-10 sm:py-14 border-t border-gray-800/70">
