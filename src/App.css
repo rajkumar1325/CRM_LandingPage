@@ -106,3 +106,35 @@
 .input-shake {
   animation: shake 0.4s ease-in-out;
 }
+
+
+
+/* Testimonials animation */
+@keyframes fadeSlide {
+  0% {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+
+  /* Fade in while sliding left */
+  20% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* Stay still & visible for 1 second */
+  60% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* Move left & fade out */
+  100% {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+}
+
+.animate-fade {
+  animation: fadeSlide 2s ease-in-out infinite;
+}

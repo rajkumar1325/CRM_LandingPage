@@ -21,15 +21,39 @@ export default function LandingPage() {
   // reference to the auth card block (for scrolling)
   const authCardRef = useRef(null);
 
+
+
   // testimonial slider index
   const [testimonialIndex, setTestimonialIndex] = useState(0);
+
+  const nextTestimonial = () => {
+    setTestimonialIndex((prev) => (prev + 1) % testimonials.length);
+  };
+
+  const prevTestimonial = () => {
+    setTestimonialIndex((prev) =>
+      prev === 0 ? testimonials.length - 1 : prev - 1
+    );
+  };
+
+  // Auto slide option
+  useEffect(() => {
+    const interval = setInterval(() => {
+      nextTestimonial();
+    }, 4000); // slides every 4s
+
+    return () => clearInterval(interval);
+  }, [testimonialIndex]);
+
+
+
 
   // faq open index
   const [openFaq, setOpenFaq] = useState(null);
 
-  // ================================
+
+
   // SCROLL LISTENER (PARALLAX)
-  // ================================
   useEffect(() => {
     let ticking = false;
 
@@ -71,24 +95,27 @@ export default function LandingPage() {
   const [selectedPlan, setSelectedPlan] = useState('Growth');
 
 
-  // ================================
-  // DATA: Testimonials & FAQs
-  // ================================
+  
+  // ................................................Testimonials & FAQs
   const testimonials = [
     {
       name: "Tony Start",
       role: "Sales Lead, Stark Tower",
       text: "We moved from messy sheets to this CRM in a week. Our team finally has one clean view of every lead.",
+      image: "/images/john.jpg" || "RK"
+
     },
     {
       name: "Elizabeth Olsen",
       role: "Founder, GrowthStack",
       text: "The dashboards are simple but powerful. The team loves the clarity on daily tasks and pipeline health.",
+      image: "/images/john.jpg" || "RK"
     },
     {
       name: "Andrew Garfield",
       role: "Head of Customer Success, TrioSoft",
       text: "Follow-ups and renewals are now automated. Churn dropped and upsells increased in just two months.",
+      image: "/images/john.jpg" || "RK"
     },
   ];
 
@@ -111,17 +138,8 @@ export default function LandingPage() {
     },
   ];
 
-  // ================================
-  // TESTIMONIAL HANDLERS
-  // ================================
-  const nextTestimonial = () => {
-    setTestimonialIndex((prev) => (prev + 1) % testimonials.length);
-  };
 
-  const prevTestimonial = () => {
-    setTestimonialIndex((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1));
-  };
-
+  
 
 
   
@@ -140,15 +158,11 @@ export default function LandingPage() {
     setTimeout(() => setAuthHighlight(false), 700); // reset after animation duration
   };
 
-  // ================================
   // PARALLAX CALCS
-  // ================================
   const layer1 = scrollY * 0.1;
   const layer2 = scrollY * 0.2;
 
-  // ================================
-  // RENDER
-  // ================================
+  // ......................................................MAIN File
   return (
     <div className="min-h-screen bg-[#050816] text-gray-100 relative overflow-x-hidden">
       {/* ================= GLOW BEAM (BACKGROUND FX) ================= */}
@@ -159,8 +173,10 @@ export default function LandingPage() {
         className="pointer-events-none absolute -top-40 -left-40 h-72 w-72 rounded-full bg-purple-600/40 blur-3xl"
         style={{ transform: `translateY(${layer1}px)` }}
       />
+
+      {/* Bottom right bubble */}
       <div
-        className="pointer-events-none absolute -bottom-40 -right-40 h-80 w-80 rounded-full bg-cyan-500/30 blur-3xl"
+        className="pointer-events-none absolute bottom-10 -right-40 h-80 w-80 rounded-full bg-cyan-500/30 blur-3xl"
         style={{ transform: `translateY(${layer2}px)` }}
       />
 
@@ -180,15 +196,15 @@ export default function LandingPage() {
         />
       </div>
 
-      {/* ================= PAGE CONTENT WRAPPER ================= */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* ================= NAVBAR ================= */}
+      {/* ========================== PAGE CONTENT WRAPPER ================ */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden">
+        {/* ==================================== NAVBAR ================ */}
         <header className="flex items-center justify-between py-5">
 
-          {/* Logo + name */}
+          {/* ............Logo + name */}
           <div className="flex items-center gap-2">
             <div className="h-9 w-9 rounded-2xl bg-gradient-to-br from-cyan-400 via-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-cyan-500/40">
-              <LogoIcon className="w-8 h-8 text-white" />
+              CC
             </div>
 
             <div className="hidden sm:flex flex-col leading-tight">
@@ -198,7 +214,7 @@ export default function LandingPage() {
           </div>
 
           {/* nav-items */}
-          <nav className="hidden md:flex items-center gap-8 text-sm text-gray-300">
+          <nav className="hidden md:flex items-center gap-8 text-sm text-gray-300 cursor-pointer">
             <a href="#features" className="hover:text-white transition">
               Features
             </a>
@@ -221,7 +237,7 @@ export default function LandingPage() {
                 setAuthMode("login");
                 focusAuthCard();
               }}
-              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition 
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition cursor-pointer 
                 ${
                 authMode === "login"
                 ? "bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-500 text-black shadow-md shadow-cyan-500/40 hover:brightness-110"
@@ -237,7 +253,7 @@ export default function LandingPage() {
                 setAuthMode("signup");
                 focusAuthCard();
               }}
-              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition
+              className={`px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium transition cursor-pointer
                 ${
                   authMode === "signup"
                   ? "bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-500 text-black shadow-md shadow-cyan-500/40 hover:brightness-110"
@@ -281,7 +297,7 @@ export default function LandingPage() {
                   focusAuthCard();
                 } }
 
-                className={` px-26 rounded-full transition ${
+                className={` px-26 rounded-full transition cursor-pointer ${
                     authMode === "signup"
                       ? "bg-gradient-to-r from-cyan-400 via-indigo-500 to-purple-500 text-black shadow-md shadow-cyan-500/40 hover:brightness-110"
                       : "bg-white text-black shadow-lg shadow-white/20"
@@ -291,8 +307,10 @@ export default function LandingPage() {
   
               </button>
 
-              <button className="px-4 py-2.5 rounded-full border border-gray-600 text-xs sm:text-sm text-gray-200 hover:border-cyan-400 hover:text-cyan-300 transition flex items-center gap-2">
-                Watch 3-min overview
+              <button 
+                className="px-4 py-2.5 rounded-full border border-gray-600 text-xs sm:text-sm text-gray-200 hover:border-cyan-400 hover:text-cyan-300 transition flex items-center gap-2"
+                >
+                  <a href="#!">Watch 3-min overview</a>
                 <span className="text-[11px]">▶</span>
               </button>
             </div>
@@ -605,7 +623,6 @@ export default function LandingPage() {
         
 
 
-        {/* Pricing section */}
 
         {/* =================........................... PRICING SECTION ================= */}
         <section id="pricing" className="py-10 sm:py-14 border-t border-gray-800/70">
@@ -668,7 +685,10 @@ export default function LandingPage() {
                 <li>• Basic task management</li>
                 <li>• Email support</li>
               </ul>
-              <button className="mt-auto w-full rounded-full border border-gray-600 text-xs sm:text-sm py-2 hover:border-cyan-400 hover:text-cyan-300 transition">
+              <button 
+                className="mt-auto w-full rounded-full border border-gray-600 text-xs sm:text-sm py-2 hover:border-cyan-400 hover:text-cyan-300 transition cursor-pointer"
+                onClick={focusAuthCard}
+                >
                 Get started
               </button>
             </div>
@@ -702,12 +722,15 @@ export default function LandingPage() {
                 <li>• Dashboards & reports</li>
                 <li>• Priority support</li>
               </ul>
-              <button className="mt-auto w-full rounded-full bg-cyan-400 text-slate-900 text-xs sm:text-sm font-semibold py-2 hover:brightness-110 transition">
+              <button 
+                className="mt-auto w-full rounded-full border border-gray-600 text-xs sm:text-sm py-2 hover:border-cyan-400 hover:text-cyan-300 transition cursor-pointer"
+                onClick={focusAuthCard}
+                >
                 Start 14-day trial
               </button>
             </div>
 
-            {/* Scale */}
+            {/* Contact Scale */}
             <div  
               onClick={ () => setSelectedPlan("Scale")}
               className={`rounded-2xl border bg-[#050b17]/90 p-5 flex flex-col card-hover 
@@ -732,7 +755,11 @@ export default function LandingPage() {
                 <li>• Dedicated success manager</li>
                 <li>• SSO & audit logs</li>
               </ul>
-              <button className="mt-auto w-full rounded-full border border-gray-600 text-xs sm:text-sm py-2 hover:border-purple-400 hover:text-purple-300 transition">
+              <button 
+                className="mt-auto w-full rounded-full border border-gray-600 text-xs sm:text-sm py-2 hover:border-purple-400 hover:text-purple-300 transition cursor-pointer"
+                onClick={focusAuthCard}
+                
+                >
                 Contact sales
               </button>
             </div>
@@ -744,58 +771,49 @@ export default function LandingPage() {
 
         {/* ================= TESTIMONIALS SECTION ================= */}
         <section id="testimonials" className="py-10 sm:py-14 border-t border-gray-800/70">
-          <div className="flex flex-col sm:flex-row justify-between gap-4 mb-6 fade-section">
-            <div>
-              <h2 className="text-lg sm:text-xl md:text-2xl font-semibold">
-                Teams that already trust OrbitCRM.
-              </h2>
-              <p className="text-xs sm:text-sm text-gray-400 mt-1 max-w-md">
-                See how teams use OrbitCRM to stabilize and grow revenue.
-              </p>
+          <div
+            key={testimonialIndex}
+            className="rounded-2xl border border-gray-800 bg-[#050b17]/90 p-5 sm:p-6 shadow-md shadow-purple-500/20
+            animate-fade"
+          >
+            {/* PROFILE IMAGE */}
+            <div className="flex items-center gap-3 mb-4">
+              <img
+                src={testimonials[testimonialIndex].image}
+                alt={testimonials[testimonialIndex].name}
+                className="h-10 w-10 sm:h-12 sm:w-12 rounded-full object-cover border border-gray-700"
+              />
+              <div>
+                <p className="font-semibold text-gray-100 text-sm sm:text-base">
+                  {testimonials[testimonialIndex].name}
+                </p>
+                <p className="text-[11px] sm:text-xs text-gray-400">
+                  {testimonials[testimonialIndex].role}
+                </p>
+              </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <button
-                onClick={prevTestimonial}
-                className="h-8 w-8 rounded-full border border-gray-700 flex items-center justify-center text-xs hover:border-cyan-400 hover:text-cyan-300 transition"
-              >
-                ←
-              </button>
-              <button
-                onClick={nextTestimonial}
-                className="h-8 w-8 rounded-full border border-gray-700 flex items-center justify-center text-xs hover:border-cyan-400 hover:text-cyan-300 transition"
-              >
-                →
-              </button>
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-gray-800 bg-[#050b17]/90 p-5 sm:p-6 shadow-md shadow-purple-500/20 fade-section">
+            {/* TESTIMONIAL TEXT */}
             <p className="text-xs sm:text-sm text-gray-200 mb-4">
               “{testimonials[testimonialIndex].text}”
             </p>
 
-            <div className="flex items-center justify-between text-[11px] sm:text-xs text-gray-400">
-              <div>
-                <p className="font-semibold text-gray-100">
-                  {testimonials[testimonialIndex].name}
-                </p>
-                <p>{testimonials[testimonialIndex].role}</p>
-              </div>
-
-              <div className="flex gap-1">
-                {testimonials.map((_, idx) => (
-                  <span
-                    key={idx}
-                    className={`h-1.5 w-3 rounded-full ${
-                      idx === testimonialIndex ? "bg-cyan-400" : "bg-gray-600"
-                    }`}
-                  />
-                ))}
-              </div>
+            {/* DOT INDICATORS */}
+            <div className="flex justify-end gap-1">
+              {testimonials.map((_, idx) => (
+                <span
+                  key={idx}
+                  className={`h-1.5 w-3 rounded-full ${
+                    idx === testimonialIndex ? "bg-cyan-400" : "bg-gray-600"
+                  }`}
+                />
+              ))}
             </div>
           </div>
+
         </section>
+
+
 
         {/* ================= FAQ SECTION ================= */}
         <section id="faq" className="py-10 sm:py-14 border-t border-gray-800/70">
@@ -837,10 +855,12 @@ export default function LandingPage() {
           </div>
         </section>
 
+
+
         {/* ================= FOOTER ================= */}
         <footer className="py-6 border-t border-gray-800/70 text-[11px] sm:text-xs text-gray-500">
           <div className="flex flex-col sm:flex-row justify-between gap-3 items-center">
-            <p>© {new Date().getFullYear()} OrbitCRM. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} CuriumCRM. All rights reserved.</p>
             <div className="flex gap-4">
               <a href="#!" className="hover:text-gray-300">
                 Privacy
